@@ -3,17 +3,17 @@ from PIL import Image
 import os
 from os import listdir
 
-# target_height = 1944
-# target_width = 2592
+target_height = 1944
+target_width = 2592
 
-# test_image_height = target_height * 1
-# test_image_width = target_width * 2
+test_image_height = target_height * 1
+test_image_width = target_width * 2
 
-target_height = 9
-target_width = 9
+# target_height = 9
+# target_width = 9
 
-test_image_height = 5
-test_image_width = 6
+# test_image_height = 5
+# test_image_width = 6
 
 def single_image_resize(image):
     image_orig_size = image.shape
@@ -84,7 +84,7 @@ def single_image_resize(image):
         bottom_rows = np.tile(bottom_row, (target_height - partial_image_frame_height,1))        
         partial_image_frame = np.concatenate((partial_image_frame, bottom_rows), 0)
     image_frame = partial_image_frame
-    print("Single reshaping done. Current shape:", image_frame.shape)
+    print("Single reshaping done. Current shape:", image_frame.shape, "\n")
     return image_frame
     
 def single_image_RGB_resize(rgb_image_array):
@@ -106,14 +106,16 @@ def multiple_image_RGB_resize(folder_path):
             rgb_image = png_image.convert("RGB")
             array_image = np.array(rgb_image)
             print("Image name:", images_name, "Image shape:", array_image.shape)
-            
+            resized_rgb_array = single_image_RGB_resize(array_image)
             counter += 1
         else:
             print("ERROR")
     return 1
 
-# multiple_image_RGB_resize("Pomfret")
-test_image = np.array([[1,2,3],[4,5,6],[7,8,9]])
-test_result = single_image_resize(test_image)
-print(test_image)
-print(test_result)
+multiple_image_RGB_resize("Pomfret")
+# test_image = np.array([[1,2,3],[4,5,6],[7,8,9]])
+# test_result = single_image_resize(test_image)
+# print("test input image:")
+# print(test_image)
+# print("output for a standard size of 9 * 9")
+# print(test_result)
