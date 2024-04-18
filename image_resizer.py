@@ -1,17 +1,19 @@
 import numpy as np
-from scipy import misc
+from PIL import Image
+import os
+from os import listdir
 
-target_height = 1944
-target_width = 2592
+# target_height = 1944
+# target_width = 2592
 
-test_image_height = target_height * 1
-test_image_width = target_width * 2
+# test_image_height = target_height * 1
+# test_image_width = target_width * 2
 
-# target_height = 4
-# target_width = 6
+target_height = 9
+target_width = 9
 
-# test_image_height = 5
-# test_image_width = 6
+test_image_height = 5
+test_image_width = 6
 
 def single_image_resize(image):
     image_orig_size = image.shape
@@ -36,17 +38,17 @@ def single_image_resize(image):
         reshaped_image = image
     
     # determining whether to shrink or to expand
-    fixed_alpha = image.shape[0] / target_height
+    fixed_alpha = reshaped_image.shape[0] / target_height
     image_frame = np.zeros((target_height, target_width))
     
     # expanding for a small image
     if (fixed_alpha < 1):
         alpha_floor = np.floor(1 / fixed_alpha)
-        partial_image_frame = np.zeros(target_height, target_width)
-        partial_image_frame_height = target_height
-        partial_image_frame_width = target_width
-        for row_loop in range(target_height):
-            for col_loop in range(target_width):
+        partial_image_frame_height = int(reshaped_image.shape[0] * alpha_floor)
+        partial_image_frame_width = int(reshaped_image.shape[1] * alpha_floor)
+        partial_image_frame = np.zeros((partial_image_frame_height, partial_image_frame_width))
+        for row_loop in range(partial_image_frame_height):
+            for col_loop in range(partial_image_frame_width):
                 partial_image_frame[row_loop][col_loop] = reshaped_image[int(np.floor(row_loop / alpha_floor))][int(np.floor(col_loop / alpha_floor))]
         print("Expanding finished, current shape:", partial_image_frame.shape)
     # shrinking for a large image
@@ -65,25 +67,53 @@ def single_image_resize(image):
                 grid_avg = grid_sum / alpha_ceil
                 partial_image_frame[row_loop][col_loop] = grid_avg
         print("Shrinking finished, current shape:", partial_image_frame.shape, "alpha:", fixed_alpha)
+    # simply copying for a nearly matched image
     else:
         partial_image_frame = reshaped_image
         partial_image_frame_height = reshaped_image.shape[0]
         partial_image_frame_width = reshaped_image.shape[1]
-        
-    if (partial_image_frame_height < target_height):
+    
+    # fixing unmatched size due to rounding   
+    if (partial_image_frame_width < target_width):
         right_col = partial_image_frame[:, -1]
         right_col = right_col[:, np.newaxis]   
-        right_cols = np.tile(right_col, (1, target_height - partial_image_frame_height))
+        right_cols = np.tile(right_col, (1, target_width - partial_image_frame_width))
         partial_image_frame = np.concatenate((partial_image_frame, right_cols), 1)
-    if (partial_image_frame_width < target_width):
+    if (partial_image_frame_height < target_height):
         bottom_row = partial_image_frame[-1, :]
-        bottom_rows = np.tile(bottom_row, (target_width - partial_image_frame_width,1))        
+        bottom_rows = np.tile(bottom_row, (target_height - partial_image_frame_height,1))        
         partial_image_frame = np.concatenate((partial_image_frame, bottom_rows), 0)
     image_frame = partial_image_frame
+    print("Single reshaping done. Current shape:", image_frame.shape)
     return image_frame
     
-def single_image_RGB_resize(image):
-    return image
+def single_image_RGB_resize(rgb_image_array):
+    resized_rgb_image = np.zeros((target_height, target_width, 3))
+    
+    print(rgb_image_array.shape)
+    
+    resized_rgb_image[:,:,0] = single_image_resize(rgb_image_array[:,:,0])
+    resized_rgb_image[:,:,1] = single_image_resize(rgb_image_array[:,:,1])
+    resized_rgb_image[:,:,2] = single_image_resize(rgb_image_array[:,:,2])
+    
+    return resized_rgb_image
 
 def multiple_image_RGB_resize(folder_path):
+    counter = 0
+    for images_name in os.listdir(folder_path):
+        if (images_name.endswith(".png")):
+            png_image = Image.open (folder_path + "/" + images_name)
+            rgb_image = png_image.convert("RGB")
+            array_image = np.array(rgb_image)
+            print("Image name:", images_name, "Image shape:", array_image.shape)
+            
+            counter += 1
+        else:
+            print("ERROR")
     return 1
+
+# multiple_image_RGB_resize("Pomfret")
+test_image = np.array([[1,2,3],[4,5,6],[7,8,9]])
+test_result = single_image_resize(test_image)
+print(test_image)
+print(test_result)
