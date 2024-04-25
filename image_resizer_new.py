@@ -76,6 +76,9 @@ def multiple_image_RGB_resize(folder_path):
     return 1
 
 multiple_image_RGB_resize("Pomfret")
+multiple_image_RGB_resize("SilverCarp")
+
+
 # test_image = np.array([[1,2,3],[4,5,6],[7,8,9]])
 # test_result = single_image_resize(test_image)
 # print("test input image:")
