@@ -1,9 +1,15 @@
 import os
 
-path_name = 'Tincaeus'
+# path_name = 'Tincaeus'
+# i = 0
+# for item in os.listdir(path_name):
+#     os.rename(os.path.join(path_name, item), os.path.join(path_name, 'tincaeus'+str(i)+'.png'))
+#     i += 1
+
+path_name = 'Rhodeus'
 i = 0
 for item in os.listdir(path_name):
-    os.rename(os.path.join(path_name, item), os.path.join(path_name, 'tincaeus'+str(i)+'.png'))
+    os.rename(os.path.join(path_name, item), os.path.join(path_name, 'rhodeus'+str(i)+'.png'))
     i += 1
 
 
